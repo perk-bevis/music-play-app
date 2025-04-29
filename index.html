@@ -1,38 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Player</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
-        integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
-        crossorigin="anonymous" />
-
-    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./assests/css/styles.css">
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
 </head>
-
 <body>
+    <div class="background">
+        <img src="" id="bg-img">
+    </div>
     <div class="player">
         <!-- Dashboard -->
         <div class="dashboard">
-            <!-- Header -->
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" id="search" placeholder="Tìm kiếm bài hát, ca sĩ ...">
+                <i class="fas fa-search"></i>
+            </div>
             <header>
                 <h4>Now playing:</h4>
-                <h2>String 57th & 9th</h2>
-            </header>
-
-            <!-- CD -->
-            <div class="cd">
-                <div class="cd-thumb"
-                    style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
+                <div class="song-info">
+                    <div class="volume-control">
+                        <i class="fas fa-volume-up volume-icon"></i>
+                        <input id="volume" class="volume" type="range" value="50" step="1" min="0" max="100" orient="vertical">
+                    </div>
+                    <h2>String 57th & 9th</h2>
+                    <div class="option">
+                        <i class="fas fa-ellipsis-h option-icon"></i>
+                        <div class="option-menu">
+                            <div class="dark-mode-toggle">
+                                <i class="fas fa-moon"></i><span style="font-size: 14px; margin-left: 8px">Dark Mode</span>
+                            </div>
+                            <div class="favorites-toggle">
+                                <i class="far fa-heart"></i><span style="font-size: 14px; margin-left: 8px">Love Songs</span>
+                            </div>
+                            <div class="upload-song">
+                                <i class="fas fa-upload"></i><span style="font-size: 14px; margin-left: 8px">Upload Song</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </header>
+            <div class="cd">
+                <div class="cd-thumb" style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')"></div>
             </div>
-
-            <!-- Control -->
             <div class="control">
                 <div class="btn btn-repeat">
                     <i class="fas fa-redo"></i>
@@ -51,29 +65,27 @@
                     <i class="fas fa-random"></i>
                 </div>
             </div>
-
             <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
-
             <audio id="audio" src=""></audio>
         </div>
-
         <!-- Playlist -->
-        <div class="playlist">
-            <div class="song">
-                <div class="thumb"
-                    style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
-                </div>
-                <div class="body">
-                    <h3 class="title">Music name</h3>
-                    <p class="author">Singer</p>
-                </div>
-                <div class="option">
-                    <i class="fas fa-ellipsis-h"></i>
-                </div>
-            </div>
+        <div class="playlist"></div>
+    </div>
+    <!-- Input file ẩn để upload -->
+    <input type="file" id="upload-audio-input" accept="audio/*" style="display: none;">
+    <input type="file" id="upload-image-input" accept="image/*" style="display: none;">
+    <!-- Modal để nhập thông tin bài hát -->
+    <div id="upload-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Thêm bài hát mới</h3>
+            <input type="text" id="song-name" placeholder="Tên bài hát" >
+            <input type="text" id="singer-name" placeholder="Tên ca sĩ">
+            <button id="upload-image-btn">Chọn ảnh</button>
+            <img id="preview-image" src="https://via.placeholder.com/150" alt="Preview" style="width: 100px; height: 100px; margin-top: 10px;">
+            <button id="save-song-btn">Lưu</button>
+            <button id="cancel-song-btn">Hủy</button>
         </div>
     </div>
     <script src="./main.js"></script>
 </body>
-
 </html>
