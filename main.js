@@ -13,6 +13,8 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
+const PLAYER_STORAGE_KEY = 'PB-PLAYER';
+
 const player = $('.player');
 // trong ham loadCurrentSong
 const heading = $('header h2');
@@ -26,9 +28,15 @@ const progress = $('#progress');
 
 const prevBtn = $('.btn-prev');
 const nextBtn = $('.btn-next');
+const randomBtn = $('.btn-random');
+const repeatBtn = $('.btn-repeat');
+const playlist = $('.playlist');
 const app = {
     currentIndex: 0,
     isPlaying: false,
+    isRandom:false,
+    isRepeat: false,
+    config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
     songs: [
         {
             name: 'Đừng làm trái tim anh đau',
@@ -92,11 +100,15 @@ const app = {
         }
     ],
 
+    setConfig: function (key,value){
+        this.config[key] = value;
+        localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config))
+    },
     // render song to ui
     render: function () {
-        const htmls = this.songs.map(song => {
+        const htmls = this.songs.map((song , index) => {
             return `
-            <div class="song">
+            <div class="song  ${index === this.currentIndex ? 'active' : ''}" data-index="${index}">
                 <div class="thumb"
                     style="background-image: url('${song.image}')">
                 </div>
@@ -184,15 +196,75 @@ const app = {
 
         // next song
         nextBtn.onclick = function (){
-            _this.nextSong();
+            if(_this.isRandom){
+                _this.playRandomSong();
+            }else{
+                _this.nextSong();
+            }
             audio.play();
+            _this.render();
         }
 
         // prev song
         prevBtn.onclick = function (){
-            _this.prevSong();
+            if(_this.isRandom){
+                _this.playRandomSong();
+            }else{
+                _this.prevSong();
+            }
             audio.play();
+            _this.render();
+            _this.scrollToActiveSong();
         }
+
+        // xử lí bật /tắt random song
+        randomBtn.onclick = function (){
+            _this.isRandom = !_this.isRandom
+            _this.setConfig('isRandom',  _this.isRandom)
+            randomBtn.classList.toggle('active', _this.isRandom);
+        }
+
+        // xử lý lặp lại 1 song 
+        repeatBtn.onclick = function (e){
+            _this.isRepeat = !_this.isRepeat
+            _this.setConfig('isRepeat', _this.isRepeat)
+            repeatBtn.classList.toggle('active', _this.isRepeat);
+        }
+
+        // xử lý khi audio ended
+        audio.onended = function (){
+            if(_this.isRepeat){
+                audio.play();
+            }else{
+                nextBtn.click();
+            }
+        }
+
+        //lắng nghe click vào playlist
+        playlist.onclick = function (e){
+            const songNode = e.target.closest('.song:not(.active)');
+            if(songNode || e.target.closest('.option')) {
+                // xử lý khi click vào song
+                if(songNode){
+                    // vì là chuỗi nên chuyển sang number
+                    _this.currentIndex = Number(songNode.dataset.index)
+                    _this.loadCurrentSong(); 
+                    audio.play();
+                    _this.render();
+                }
+
+                // xử lý khi click vào song option
+                if(e.target.closest('.option')){
+
+                }
+            }
+        }
+    },
+
+    scrollToActiveSong: function (){
+        setTimeout(() => {
+            $('.song.active').scrollIntoView();
+        },500)
     },
 
     // tai thong tin bai hai dau tien vao ui khi chay app
@@ -201,6 +273,12 @@ const app = {
         cdthumb.style.backgroundImage = `url('${this.currentSong.image}')`;
         audio.src = this.currentSong.path;
     },
+
+    loadConfig: function () {
+        this.isRandom = this.config.isRandom
+        this.isRepeat = this.config.isRepeat
+    }, 
+
     nextSong: function () {
         this.currentIndex++;
         if(this.currentIndex >= this.songs.length){
@@ -217,7 +295,19 @@ const app = {
         this.loadCurrentSong();
     },
 
+    playRandomSong: function () {
+        let newIndex;
+        do {
+            newIndex = Math.floor(Math.random() * this.songs.length);
+        } while (newIndex === this.currentIndex)
+        this.currentIndex = newIndex;
+        this.loadCurrentSong();
+    },
+
     start: function () {
+        // gán cấu hình từ config vào app
+        this.loadConfig();
+
         // dinh nghia cac thuoc tinh cho object
         this.defineProperties();
         // lang nghe xu li cac su kien (dom events)
@@ -228,6 +318,10 @@ const app = {
 
         // render playlist
         this.render();
+
+        // hiển thị trạng thái ban đầu của button repeat và ramdom
+        randomBtn.classList.toggle('active', this.isRandom);
+        repeatBtn.classList.toggle('active', this.isRepeat);
     }
 }
 
